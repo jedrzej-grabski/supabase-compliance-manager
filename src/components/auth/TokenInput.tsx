@@ -15,15 +15,12 @@ export default function TokenInput() {
         setError('');
 
         try {
-            // Validate token format first
+
             if (!tokenInput.trim()) {
                 throw new Error('Please enter a Supabase PAT token');
             }
-
-            // Set the token in context (this will also save to localStorage)
             setToken(tokenInput);
 
-            // Redirect to dashboard
             router.push('/dashboard');
         } catch (err: any) {
             setError(err.message || 'Failed to validate token');
