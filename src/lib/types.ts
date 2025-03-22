@@ -16,12 +16,12 @@ export interface SupabaseProject {
     created_at: string;
 }
 
-export interface SecurityCheckResult {
+export interface ComplianceCheckResult {
     projectId: string;
-    status: ProjectSecurityStatus;
+    status: ProjectComplianceStatus;
 }
 
-export interface ProjectSecurityStatus {
+export interface ProjectComplianceStatus {
     mfa: {
         enabled: boolean;
         data: MfaCheck | null;

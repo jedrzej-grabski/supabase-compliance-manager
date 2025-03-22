@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiKey, MfaCheck, PitrCheck, RlsCheck, SecurityCheckResult, SupabaseProject } from './types';
+import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject } from './types';
 
 export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
     try {
@@ -76,12 +76,12 @@ export async function fetchPitrCheck(token: string, projectId: string): Promise<
 
 
 
-export async function checkProjectSecurity(
+export async function checkProjectCompliance(
     token: string,
     project: SupabaseProject,
     log: boolean = false,
-): Promise<SecurityCheckResult> {
-    const result: SecurityCheckResult = {
+): Promise<ComplianceCheckResult> {
+    const result: ComplianceCheckResult = {
         projectId: project.id,
         status: {
             mfa: {
