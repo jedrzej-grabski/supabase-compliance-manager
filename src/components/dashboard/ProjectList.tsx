@@ -21,9 +21,9 @@ export default function ProjectList() {
                 const data = await fetchProjects(token);
                 setProjects(data);
                 setError('');
-            } catch (err: any) {
-                setError('Failed to fetch projects. Please check your token.');
-                console.error(err);
+            } catch (err: unknown) {
+                const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+                setError(errorMessage);
             } finally {
                 setIsLoading(false);
             }

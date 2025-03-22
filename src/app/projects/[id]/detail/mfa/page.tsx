@@ -5,15 +5,14 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, checkProjectCompliance, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
-import { MfaCheck } from '@/lib/types';
+import { MfaCheck, SupabaseProject, User } from '@/lib/types';
 
 export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<{ id: string }> }) {
     const params = React.use(ParamsPromise);
     const { token } = useAuth();
-    const [project, setProject] = useState<any>(null);
+    const [project, setProject] = useState<SupabaseProject>({} as SupabaseProject);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isFixing, setIsFixing] = useState(false);
     const [mfaDetails, setMfaDetails] = useState<MfaCheck>();
     const [fixResult, setFixResult] = useState<{ success: boolean; message: string } | null>(null);
     const [showChat, setShowChat] = useState(false);
@@ -55,7 +54,6 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
         if (!token || !project) return;
 
         try {
-            setIsFixing(true);
             setFixResult(null);
 
             const result = await requestAutoFix(token, project.id, 'mfa');
@@ -63,8 +61,6 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
             setFixResult(result);
         } catch (err) {
             setError(`Auto-fix failed: ${(err as Error).message}`);
-        } finally {
-            setIsFixing(false);
         }
     };
 
@@ -147,7 +143,7 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {mfaDetails.users.map((user: any) => (
+                                        {mfaDetails.users.map((user: User) => (
                                             <tr key={user.id}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {user.id}

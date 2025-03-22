@@ -40,20 +40,24 @@ export interface ProjectComplianceStatus {
 
 export interface RlsCheck {
     passing: boolean;
-    tables: {
-        schemaname: string;
-        tablename: string;
-        rowsecurity: boolean;
-    }[];
+    tables: Table[];
+}
+
+export interface Table {
+    schemaname: string;
+    tablename: string;
+    rowsecurity: boolean;
 }
 
 export interface MfaCheck {
     passing: boolean;
-    users: {
-        id: string;
-        email: string;
-        mfaEnabled: boolean;
-    }[];
+    users: User[];
+}
+
+export interface User {
+    id: string;
+    email: string;
+    mfaEnabled: boolean;
 }
 
 

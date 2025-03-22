@@ -5,11 +5,12 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, fetchRlsCheck, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
+import { SupabaseProject, Table } from '@/lib/types';
 
 export default function RlsFixPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const { token } = useAuth();
     const params = React.use(paramsPromise);
-    const [project, setProject] = useState<any>(null);
+    const [project, setProject] = useState<SupabaseProject>({} as SupabaseProject);
     const [rlsDetails, setRlsDetails] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -115,7 +116,7 @@ export default function RlsFixPage({ params: paramsPromise }: { params: Promise<
                     <div className="mb-6 bg-yellow-50 p-4 rounded-md">
                         <h3 className="font-medium text-yellow-800 mb-2">Why is RLS Important?</h3>
                         <p className="text-yellow-700">
-                            Row-Level Security ensures that users can only access the specific database rows they're
+                            Row-Level Security ensures that users can only access the specific database rows they&apos;re
                             authorized to view or modify. Without RLS, your data is vulnerable to unauthorized access
                             when using client-side applications with Supabase.
                         </p>
@@ -137,7 +138,7 @@ export default function RlsFixPage({ params: paramsPromise }: { params: Promise<
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {rlsDetails.tables.map((table: any) => (
+                                        {rlsDetails.tables.map((table: Table) => (
                                             <tr key={table.tablename}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {table.tablename}

@@ -5,16 +5,15 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, fetchPitrCheck, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
-import { PitrCheck } from '@/lib/types';
+import { PitrCheck, SupabaseProject } from '@/lib/types';
 
 export default function PitrFixPage({ params: ParamsPromise }: { params: Promise<{ id: string }> }) {
     const params = React.use(ParamsPromise);
     const { token } = useAuth();
-    const [project, setProject] = useState<any>(null);
+    const [project, setProject] = useState<SupabaseProject>({} as SupabaseProject);
     const [pitrDetails, setPitrDetails] = useState<PitrCheck>();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isFixing, setIsFixing] = useState(false);
     const [fixResult, setFixResult] = useState<{ success: boolean; message: string } | null>(null);
     const [showChat, setShowChat] = useState(false);
     const [isPitrEnabled, setIsPitrEnabled] = useState(false);
@@ -53,15 +52,12 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
         if (!token || !project) return;
 
         try {
-            setIsFixing(true);
             setFixResult(null);
 
             const result = await requestAutoFix(token, project.id, 'pitr');
             setFixResult(result);
         } catch (err) {
             setError(`Auto-fix failed: ${(err as Error).message}`);
-        } finally {
-            setIsFixing(false);
         }
     };
 

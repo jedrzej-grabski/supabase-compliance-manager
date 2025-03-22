@@ -22,8 +22,10 @@ export default function TokenInput() {
             setToken(tokenInput);
 
             router.push('/dashboard');
-        } catch (err: any) {
-            setError(err.message || 'Failed to validate token');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+            setError(errorMessage);
+
         } finally {
             setIsLoading(false);
         }
