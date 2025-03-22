@@ -81,3 +81,14 @@ export interface AIAssistantMessage {
     role: 'user' | 'assistant' | 'system';
     content: string;
 }
+
+
+export type SecurityFixAction = 'ai_assistance' | 'autofix';
+
+export interface SecurityFixLog {
+    id?: string;
+    project_id: string;
+    check_type: 'mfa' | 'rls' | 'pitr';
+    action_type: SecurityFixAction;
+    timestamp: string;
+}

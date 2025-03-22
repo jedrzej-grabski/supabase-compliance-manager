@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject } from './types';
+import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject, SecurityFixLog, SecurityFixAction } from './types';
+import { createClient } from '@supabase/supabase-js';
 
 export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
     try {
@@ -124,6 +125,13 @@ export async function checkProjectCompliance(
         result.status.rls.enabled = rlsCheck.passing;
         result.status.rls.data = rlsCheck;
 
+        if (log) {
+            console.log('Logging security check results');
+            await logSecurityCheck('mfa', project.id, result.status.mfa.enabled);
+            await logSecurityCheck('rls', project.id, result.status.rls.enabled);
+            await logSecurityCheck('pitr', project.id, result.status.pitr.enabled);
+        }
+
 
         return result;
 
@@ -150,5 +158,64 @@ export async function requestAutoFix(
     } catch (error) {
         console.error(`Error requesting auto-fix for ${fixType} on project ${projectId}:`, error);
         throw error;
+    }
+}
+
+
+let loggingClient: any = null;
+
+function getLoggingClient() {
+    if (!loggingClient) {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_LOGGING_URL;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_LOGGING_KEY;
+
+        if (supabaseUrl && supabaseKey) {
+            loggingClient = createClient(supabaseUrl, supabaseKey);
+        }
+    }
+    return loggingClient;
+}
+
+export async function logSecurityCheck(
+    checkType: 'mfa' | 'rls' | 'pitr',
+    projectId: string,
+    status: boolean
+): Promise<void> {
+    const client = getLoggingClient();
+    if (!client) return;
+
+    try {
+        const logEntry: SecurityCheckLog = {
+            project_id: projectId,
+            check_type: checkType,
+            status,
+            timestamp: new Date().toISOString(),
+        };
+
+        await client.from('security_checks').insert(logEntry);
+    } catch (error) {
+        console.error('Error logging security check:', error);
+    }
+}
+
+export async function logSecurityFix(
+    projectId: string,
+    checkType: 'mfa' | 'rls' | 'pitr',
+    actionType: SecurityFixAction
+): Promise<void> {
+    const client = getLoggingClient();
+    if (!client) return;
+
+    try {
+        const logEntry: SecurityFixLog = {
+            project_id: projectId,
+            check_type: checkType,
+            action_type: actionType,
+            timestamp: new Date().toISOString(),
+        };
+        console.log('Logging security fix:', logEntry);
+        await client.from('security_fixes').insert(logEntry);
+    } catch (error) {
+        console.error('Error logging security fix:', error);
     }
 }
