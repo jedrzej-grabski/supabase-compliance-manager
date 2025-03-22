@@ -193,7 +193,7 @@ export async function logComplianceCheck(
             timestamp: new Date().toISOString(),
         };
 
-        await client.from('compliance_check').insert(logEntry);
+        await client.from('compliance_checks').insert(logEntry);
     } catch (error) {
         console.error('Error logging compliance check:', error);
     }
