@@ -133,3 +133,22 @@ export async function checkProjectSecurity(
         return result;
     }
 }
+
+export async function requestAutoFix(
+    token: string,
+    projectId: string,
+    fixType: 'mfa' | 'rls' | 'pitr'
+): Promise<{ success: boolean; message: string }> {
+    try {
+        const response = await axios.post(`/api/projects/${projectId}/fixes/${fixType}`, null, {
+            headers: {
+                'x-supabase-token': token,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error(`Error requesting auto-fix for ${fixType} on project ${projectId}:`, error);
+        throw error;
+    }
+}
