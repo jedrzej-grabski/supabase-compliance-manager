@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject } from './types';
+import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject, ComplianceCheckLog, ComplianceFixAction, ComplianceFixLog } from './types';
+import { createClient } from '@supabase/supabase-js';
 
 export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
     try {
@@ -124,6 +125,13 @@ export async function checkProjectCompliance(
         result.status.rls.enabled = rlsCheck.passing;
         result.status.rls.data = rlsCheck;
 
+        if (log) {
+            console.log('Logging security check results');
+            await logComplianceCheck('mfa', project.id, result.status.mfa.enabled);
+            await logComplianceCheck('rls', project.id, result.status.rls.enabled);
+            await logComplianceCheck('pitr', project.id, result.status.pitr.enabled);
+        }
+
 
         return result;
 
@@ -146,9 +154,70 @@ export async function requestAutoFix(
             },
         });
 
+        await logComplianceFix(projectId, fixType, 'autofix');
+
         return response.data;
     } catch (error) {
         console.error(`Error requesting auto-fix for ${fixType} on project ${projectId}:`, error);
         throw error;
+    }
+}
+
+
+let loggingClient: any = null;
+
+function getLoggingClient() {
+    if (!loggingClient) {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_LOGGING_URL;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_LOGGING_KEY;
+
+        if (supabaseUrl && supabaseKey) {
+            loggingClient = createClient(supabaseUrl, supabaseKey);
+        }
+    }
+    return loggingClient;
+}
+
+export async function logComplianceCheck(
+    checkType: 'mfa' | 'rls' | 'pitr',
+    projectId: string,
+    status: boolean
+): Promise<void> {
+    const client = getLoggingClient();
+    if (!client) return;
+
+    try {
+        const logEntry: ComplianceCheckLog = {
+            project_id: projectId,
+            check_type: checkType,
+            status,
+            timestamp: new Date().toISOString(),
+        };
+
+        await client.from('compliance_check').insert(logEntry);
+    } catch (error) {
+        console.error('Error logging compliance check:', error);
+    }
+}
+
+export async function logComplianceFix(
+    projectId: string,
+    checkType: 'mfa' | 'rls' | 'pitr',
+    actionType: ComplianceFixAction
+): Promise<void> {
+    const client = getLoggingClient();
+    if (!client) return;
+
+    try {
+        const logEntry: ComplianceFixLog = {
+            project_id: projectId,
+            check_type: checkType,
+            action_type: actionType,
+            timestamp: new Date().toISOString(),
+        };
+        console.log('Logging compliance fix:', logEntry);
+        await client.from('compliance_fixes').insert(logEntry);
+    } catch (error) {
+        console.error('Error logging compliance fix:', error);
     }
 }

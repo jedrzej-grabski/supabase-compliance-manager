@@ -81,3 +81,22 @@ export interface AIAssistantMessage {
     role: 'user' | 'assistant' | 'system';
     content: string;
 }
+
+
+export type ComplianceFixAction = 'ai_assistance' | 'autofix';
+
+export interface ComplianceFixLog {
+    id?: string;
+    project_id: string;
+    check_type: 'mfa' | 'rls' | 'pitr';
+    action_type: ComplianceFixAction;
+    timestamp: string;
+}
+
+export interface ComplianceCheckLog {
+    id?: string;
+    project_id: string;
+    check_type: 'mfa' | 'rls' | 'pitr';
+    status: boolean;
+    timestamp: string;
+}

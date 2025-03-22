@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { fetchProjects, requestAutoFix, fetchRlsCheck } from '@/lib/supabase';
+import { fetchProjects, requestAutoFix, fetchRlsCheck, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForSecurityCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
 
@@ -62,6 +62,7 @@ export default function RlsFixPage({ params: paramsPromise }: { params: Promise<
     };
 
     const handleChatAssistance = () => {
+        logComplianceFix(project.id, 'rls', 'ai_assistance');
         setShowChat(true);
     };
 

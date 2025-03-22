@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { fetchProjects, requestAutoFix, fetchPitrCheck } from '@/lib/supabase';
+import { fetchProjects, requestAutoFix, fetchPitrCheck, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForSecurityCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
 import { PitrCheck } from '@/lib/types';
@@ -66,6 +66,7 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
     };
 
     const handleChatAssistance = () => {
+        logComplianceFix(project.id, 'pitr', 'ai_assistance');
         setShowChat(true);
     };
 
