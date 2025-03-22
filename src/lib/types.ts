@@ -76,3 +76,8 @@ export interface ApiKey {
     name: string;
     api_key: string;
 };
+
+export interface AIAssistantMessage {
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+}

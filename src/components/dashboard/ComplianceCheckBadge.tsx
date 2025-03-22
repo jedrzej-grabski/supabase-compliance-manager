@@ -40,7 +40,7 @@ export default function SecurityCheckBadge({
 
                 <div className="flex space-x-2 mt-1">
                     <Link
-                        href={`/projects/${projectId}/fix/${checkType}`}
+                        href={`/projects/${projectId}/detail/${checkType}`}
                         className="inline-flex justify-center w-full items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                         View Details
@@ -63,7 +63,7 @@ export default function SecurityCheckBadge({
 
                 <div className="flex space-x-2 mt-1">
                     <Link
-                        href={`/projects/${projectId}/fix/${checkType}?status=${enabled ? 'enabled' : 'disabled'}`}
+                        href={`/projects/${projectId}/detail/${checkType}`}
                         className="inline-flex justify-center w-full items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                         View Solutions
