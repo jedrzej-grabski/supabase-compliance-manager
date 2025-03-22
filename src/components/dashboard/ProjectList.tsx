@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchProjects } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { SupabaseProject } from '@/lib/types';
-import ProjectSecurityStatus from './ProjectComplianceStatus';
+import ProjectComplianceStatus from './ProjectComplianceStatus';
 
 export default function ProjectList() {
     const [projects, setProjects] = useState<SupabaseProject[]>([]);
@@ -161,7 +161,7 @@ export default function ProjectList() {
                                     </svg>
                                     Compliance Status:
                                 </h5>
-                                <ProjectSecurityStatus project={project} />
+                                <ProjectComplianceStatus project={project} />
                             </div>
                         </div>
                     </li>

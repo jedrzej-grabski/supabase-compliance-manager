@@ -34,11 +34,11 @@ export async function sendChatMessage(
     }
 }
 
-export function getSystemPromptForSecurityCheck(
+export function getSystemPromptForComplianceCheck(
     checkType: 'mfa' | 'rls' | 'pitr',
     projectDetails: any
 ): string {
-    const basePrompt = `You are a Supabase security expert assistant. Keep your answers short and concise. You are helping with a Supabase project named "${projectDetails.name}" (ID: ${projectDetails.id}).`;
+    const basePrompt = `You are a Supabase compliance expert assistant. Keep your answers short and concise. You are helping with a Supabase project named "${projectDetails.name}" (ID: ${projectDetails.id}).`;
 
     switch (checkType) {
         case 'mfa':

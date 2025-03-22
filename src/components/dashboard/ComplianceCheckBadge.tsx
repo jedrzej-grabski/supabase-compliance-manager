@@ -9,7 +9,7 @@ interface ComplianceCheckBadgeProps {
     checkType?: 'mfa' | 'rls' | 'pitr';
 }
 
-export default function SecurityCheckBadge({
+export default function ComplianceCheckBadge({
     enabled,
     label,
     loading = false,

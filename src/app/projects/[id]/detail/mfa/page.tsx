@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, checkProjectCompliance, logComplianceFix } from '@/lib/supabase';
-import { getSystemPromptForSecurityCheck } from '@/lib/openrouter';
+import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
 import { MfaCheck } from '@/lib/types';
 
@@ -28,10 +28,10 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
                 const projects = await fetchProjects(token);
                 const foundProject = projects.find(p => p.id === params.id);
                 if (foundProject) {
-                    const securityCheck = await checkProjectCompliance(token, foundProject, false);
-                    setIsMfaEnabled(securityCheck.status.mfa.enabled);
-                    if (securityCheck.status.mfa.data) {
-                        setMfaDetails(securityCheck.status.mfa.data);
+                    const complianceCheck = await checkProjectCompliance(token, foundProject, false);
+                    setIsMfaEnabled(complianceCheck.status.mfa.enabled);
+                    if (complianceCheck.status.mfa.data) {
+                        setMfaDetails(complianceCheck.status.mfa.data);
                     }
                 } else {
                     setError('Project not found');
@@ -142,7 +142,7 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
                                                 Email
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                MFA Enbled
+                                                MFA Enabled
                                             </th>
                                         </tr>
                                     </thead>
@@ -204,7 +204,7 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
                             ) : (
                                 <ChatComponent
                                     checkType="mfa"
-                                    systemPrompt={getSystemPromptForSecurityCheck('mfa', project)}
+                                    systemPrompt={getSystemPromptForComplianceCheck('mfa', project)}
                                     initialMessage="Hi! I need help configuring MFA for my Supabase project. What are the steps to implement this for all users?"
                                 />
                             )}

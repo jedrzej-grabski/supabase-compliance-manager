@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, fetchPitrCheck, logComplianceFix } from '@/lib/supabase';
-import { getSystemPromptForSecurityCheck } from '@/lib/openrouter';
+import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
 import { PitrCheck } from '@/lib/types';
 
@@ -17,7 +17,7 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
     const [isFixing, setIsFixing] = useState(false);
     const [fixResult, setFixResult] = useState<{ success: boolean; message: string } | null>(null);
     const [showChat, setShowChat] = useState(false);
-    const [isPitrEnabled, setisPitrEnabled] = useState(false);
+    const [isPitrEnabled, setIsPitrEnabled] = useState(false);
 
     useEffect(() => {
         const getProjectAndPitr = async () => {
@@ -29,7 +29,7 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
                 const foundProject = projects.find(p => p.id === params.id);
 
                 const pitrCheck = await fetchPitrCheck(token, params.id);
-                setisPitrEnabled(pitrCheck.pitr_enabled);
+                setIsPitrEnabled(pitrCheck.pitr_enabled);
 
                 if (!foundProject) {
                     setError('Project not found');
@@ -220,7 +220,7 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
                             ) : (
                                 <ChatComponent
                                     checkType="pitr"
-                                    systemPrompt={getSystemPromptForSecurityCheck('pitr', project)}
+                                    systemPrompt={getSystemPromptForComplianceCheck('pitr', project)}
                                     initialMessage="I'd like to enable Point-in-Time Recovery for my Supabase project. What are the costs involved and how do I configure it properly?"
                                 />
                             )}

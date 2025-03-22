@@ -67,7 +67,6 @@ export async function fetchPitrCheck(token: string, projectId: string): Promise<
                 'x-supabase-token': token,
             },
         });
-        console.log('PITR response:', response.data);
         return response.data;
     } catch (error) {
         console.error(`Error fetching postgres config for project ${projectId}:`, error);
@@ -126,7 +125,7 @@ export async function checkProjectCompliance(
         result.status.rls.data = rlsCheck;
 
         if (log) {
-            console.log('Logging security check results');
+            console.log('Logging compliance check results');
             await logComplianceCheck('mfa', project.id, result.status.mfa.enabled);
             await logComplianceCheck('rls', project.id, result.status.rls.enabled);
             await logComplianceCheck('pitr', project.id, result.status.pitr.enabled);
@@ -136,8 +135,8 @@ export async function checkProjectCompliance(
         return result;
 
     } catch (error) {
-        console.error(`Error checking security for project ${project.id}:`, error);
-        result.status.error = `Failed to check security: ${(error as Error).message}`;
+        console.error(`Error checking compliance for project ${project.id}:`, error);
+        result.status.error = `Failed to check compliance: ${(error as Error).message}`;
         return result;
     }
 }
@@ -215,7 +214,7 @@ export async function logComplianceFix(
             action_type: actionType,
             timestamp: new Date().toISOString(),
         };
-        console.log('Logging compliance fix:', logEntry);
+
         await client.from('compliance_fixes').insert(logEntry);
     } catch (error) {
         console.error('Error logging compliance fix:', error);

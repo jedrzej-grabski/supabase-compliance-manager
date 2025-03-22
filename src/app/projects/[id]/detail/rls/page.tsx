@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, fetchRlsCheck, logComplianceFix } from '@/lib/supabase';
-import { getSystemPromptForSecurityCheck } from '@/lib/openrouter';
+import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
 
 export default function RlsFixPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -191,7 +191,7 @@ export default function RlsFixPage({ params: paramsPromise }: { params: Promise<
                             ) : (
                                 <ChatComponent
                                     checkType="rls"
-                                    systemPrompt={getSystemPromptForSecurityCheck('rls', project)}
+                                    systemPrompt={getSystemPromptForComplianceCheck('rls', project)}
                                     initialMessage="I need help setting up Row-Level Security for my Supabase tables. Can you explain how to create basic RLS policies and implement them effectively?"
                                 />
                             )}
