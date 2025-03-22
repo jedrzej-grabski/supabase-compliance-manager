@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
     request: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
     if (!token) {
         return NextResponse.json(
             { error: 'Unauthorized. No token provided.' },
-            { status: 401 }
+            { status: StatusCodes.UNAUTHORIZED }
         );
     }
 
@@ -40,7 +41,7 @@ export async function GET(
         console.error('Error proxying request to Supabase:', error);
         return NextResponse.json(
             { error: 'Failed to fetch auth config', message: (error as Error).message },
-            { status: 500 }
+            { status: StatusCodes.INTERNAL_SERVER_ERROR }
         );
     }
 }

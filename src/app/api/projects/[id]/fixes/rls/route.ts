@@ -1,7 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
+
+export async function POST(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
@@ -18,10 +19,10 @@ export async function GET(
 
     try {
         const tablesQuery = `
-            SELECT schemaname, tablename
-            FROM pg_tables
-            WHERE schemaname = 'public';
-        `;
+      SELECT schemaname, tablename
+      FROM pg_tables
+      WHERE schemaname = 'public';
+    `;
 
         const tablesResponse = await fetch(`https://api.supabase.com/v1/projects/${projectId}/database/query`, {
             method: 'POST',
@@ -42,13 +43,11 @@ export async function GET(
 
         const tablesData = await tablesResponse.json();
 
-        const tablesWithRlsPromises = tablesData.map(async (table: { schemaname: string; tablename: string }) => {
-            const rlsQuery = `
-            SELECT rowsecurity
-            FROM pg_tables
-            WHERE schemaname = 'public' AND tablename = '${table.tablename}'
-            LIMIT 1;
-            `;
+        const rlsPromises = tablesData.map(async (table: { schemaname: string; tablename: string }) => {
+            const enableRlsQuery = `
+        ALTER TABLE ${table.schemaname}.${table.tablename}
+        ENABLE ROW LEVEL SECURITY;
+      `;
 
             const rlsResponse = await fetch(`https://api.supabase.com/v1/projects/${projectId}/database/query`, {
                 method: 'POST',
@@ -56,29 +55,23 @@ export async function GET(
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query: rlsQuery }),
+                body: JSON.stringify({ query: enableRlsQuery }),
             });
 
             if (!rlsResponse.ok) {
                 const errorData = await rlsResponse.json().catch(() => null);
-                throw new Error(`Failed to fetch RLS for table ${table.tablename}: ${JSON.stringify(errorData)}`);
+                throw new Error(`Failed to enable RLS for table ${table.tablename}: ${JSON.stringify(errorData)}`);
             }
 
-            const rlsData = await rlsResponse.json();
-            return { ...table, rowsecurity: rlsData[0]?.rowsecurity };
+            return { table: table.tablename, status: 'RLS enabled' };
         });
 
-        const tablesWithRls = await Promise.all(tablesWithRlsPromises);
-        const passing = tablesWithRls.every(table => table.rowsecurity === true);
-        const data = {
-            passing,
-            tables: tablesWithRls,
-        };
-        return NextResponse.json(data);
+        const rlsResults = await Promise.all(rlsPromises);
+        return NextResponse.json({ success: true, results: rlsResults, message: 'RLS auto-fix applied successfully.' });
     } catch (error) {
-        console.error('Error proxying request to Supabase:', error);
+        console.error('Error with RLS auto-fix:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch postgres config', message: (error as Error).message },
+            { error: 'Failed to auto-fix RLS', message: (error as Error).message },
             { status: StatusCodes.INTERNAL_SERVER_ERROR }
         );
     }
