@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiKey, MfaCheck, SecurityCheckResult, SupabaseProject } from './types';
+import { ApiKey, MfaCheck, PitrCheck, RlsCheck, SecurityCheckResult, SupabaseProject } from './types';
 
 export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
     try {
@@ -20,16 +20,6 @@ export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
 }
 
 
-export async function fetchMfaCheck(url: string, serviceKey: string): Promise<MfaCheck> {
-    try {
-        const response = await axios.post(`/api/checks/mfa`, { url, serviceKey });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching MFA check:', error);
-        throw error;
-    }
-}
-
 export async function fetchProjectApiKeys(token: string, projectId: string): Promise<ApiKey[]> {
     try {
         const response = await axios.get(`/api/projects/${projectId}/api-keys`, {
@@ -43,6 +33,47 @@ export async function fetchProjectApiKeys(token: string, projectId: string): Pro
         throw error;
     }
 }
+
+export async function fetchMfaCheck(url: string, serviceKey: string): Promise<MfaCheck> {
+    try {
+        const response = await axios.post(`/api/checks/mfa`, { url, serviceKey });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching MFA check:', error);
+        throw error;
+    }
+}
+
+export async function fetchRlsCheck(token: string, projectId: string): Promise<RlsCheck> {
+    try {
+        const response = await axios.get(`/api/projects/${projectId}/checks/rls`, {
+            headers: {
+                'x-supabase-token': token,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching postgres config for project ${projectId}:`, error);
+        throw error;
+    }
+}
+
+export async function fetchPitrCheck(token: string, projectId: string): Promise<PitrCheck> {
+    try {
+        const response = await axios.get(`/api/projects/${projectId}/checks/pitr`, {
+            headers: {
+                'x-supabase-token': token,
+            },
+        });
+        console.log('PITR response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching postgres config for project ${projectId}:`, error);
+        throw error;
+    }
+}
+
 
 
 export async function checkProjectSecurity(
@@ -70,5 +101,35 @@ export async function checkProjectSecurity(
         },
     };
 
-    return result;
+    try {
+        const apiKeys = await fetchProjectApiKeys(token, project.id);
+        const serviceKey = apiKeys.find((key) => key.name === 'service_role');
+
+        if (!serviceKey) {
+            result.status.error = 'Service role key not found';
+            return result;
+        }
+
+        const backupConfig = await fetchPitrCheck(token, project.id);
+        result.status.pitr.enabled = backupConfig.pitr_enabled;
+        result.status.pitr.data = backupConfig
+
+
+        const mfaCheck = await fetchMfaCheck(project.url, serviceKey.api_key);
+        result.status.mfa.enabled = mfaCheck.passing;
+        result.status.mfa.data = mfaCheck;
+
+
+        const rlsCheck = await fetchRlsCheck(token, project.id);
+        result.status.rls.enabled = rlsCheck.passing;
+        result.status.rls.data = rlsCheck;
+
+
+        return result;
+
+    } catch (error) {
+        console.error(`Error checking security for project ${project.id}:`, error);
+        result.status.error = `Failed to check security: ${(error as Error).message}`;
+        return result;
+    }
 }
