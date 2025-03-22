@@ -1,3 +1,5 @@
+import { SupabaseProject } from "./types";
+
 export async function sendChatMessage(
     messages: string[],
     model: string = 'meta-llama/llama-3.3-70b-instruct:free'
@@ -36,7 +38,7 @@ export async function sendChatMessage(
 
 export function getSystemPromptForComplianceCheck(
     checkType: 'mfa' | 'rls' | 'pitr',
-    projectDetails: any
+    projectDetails: SupabaseProject
 ): string {
     const basePrompt = `You are a Supabase compliance expert assistant. Keep your answers short and concise. You are helping with a Supabase project named "${projectDetails.name}" (ID: ${projectDetails.id}).`;
 

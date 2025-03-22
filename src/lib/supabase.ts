@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ApiKey, MfaCheck, PitrCheck, RlsCheck, ComplianceCheckResult, SupabaseProject, ComplianceCheckLog, ComplianceFixAction, ComplianceFixLog } from './types';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export async function fetchProjects(token: string): Promise<SupabaseProject[]> {
     try {
@@ -163,7 +163,7 @@ export async function requestAutoFix(
 }
 
 
-let loggingClient: any = null;
+let loggingClient: SupabaseClient | null = null;
 
 function getLoggingClient() {
     if (!loggingClient) {

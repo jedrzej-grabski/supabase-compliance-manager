@@ -3,11 +3,11 @@ import { StatusCodes } from 'http-status-codes';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params: promisedParams }: { params: Promise<{ id: string }> }
 ) {
-    const resolvedParams = await params;
+    const params = await promisedParams;
     const token = request.headers.get('x-supabase-token');
-    const projectId = resolvedParams.id;
+    const projectId = params.id;
 
     if (!token) {
         return NextResponse.json(

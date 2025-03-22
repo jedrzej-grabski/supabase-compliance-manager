@@ -5,13 +5,13 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchProjects, requestAutoFix, fetchRlsCheck, logComplianceFix } from '@/lib/supabase';
 import { getSystemPromptForComplianceCheck } from '@/lib/openrouter';
 import ChatComponent from '@/components/detail/ChatComponent';
-import { SupabaseProject, Table } from '@/lib/types';
+import { RlsCheck, SupabaseProject, Table } from '@/lib/types';
 
 export default function RlsFixPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const { token } = useAuth();
     const params = React.use(paramsPromise);
     const [project, setProject] = useState<SupabaseProject>({} as SupabaseProject);
-    const [rlsDetails, setRlsDetails] = useState<any>(null);
+    const [rlsDetails, setRlsDetails] = useState<RlsCheck>({} as RlsCheck);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFixing, setIsFixing] = useState(false);
