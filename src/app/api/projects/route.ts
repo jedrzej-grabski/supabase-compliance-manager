@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         console.error('Error proxying request to Supabase:', error);
         return NextResponse.json(
             { error: 'Failed to fetch projects' },
-            { status: StatusCodes.INTERNAL_SERVER_ERROR }
+            { status: StatusCodes.NOT_FOUND }
         );
     }
 }
