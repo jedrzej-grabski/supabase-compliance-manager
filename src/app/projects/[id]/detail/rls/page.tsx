@@ -94,7 +94,7 @@ export default function RlsFixPage({ params: paramsPromise }: { params: Promise<
             <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">Row-Level Security (RLS)</h2>
                 <p className="text-gray-600">
-                    Enable RLS to control access to your database tables in {project?.name}.
+                    Enable RLS to control access to your database tables in <strong>{project?.name}</strong>.
                 </p>
             </div>
 

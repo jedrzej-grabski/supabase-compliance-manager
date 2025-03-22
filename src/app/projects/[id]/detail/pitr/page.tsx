@@ -98,7 +98,7 @@ export default function PitrFixPage({ params: ParamsPromise }: { params: Promise
             <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">Point-in-Time Recovery (PITR)</h2>
                 <p className="text-gray-600">
-                    Enable PITR to add advanced database recovery capabilities for {project?.name}.
+                    Enable PITR to add advanced database recovery capabilities for <strong>{project?.name}</strong>.
                 </p>
             </div>
 

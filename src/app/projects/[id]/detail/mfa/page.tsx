@@ -96,7 +96,7 @@ export default function MfaFixPage({ params: ParamsPromise }: { params: Promise<
             <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">Multi-Factor Authentication (MFA)</h2>
                 <p className="text-gray-600">
-                    Enable MFA to add an extra layer of security for user accounts in {project?.name}.
+                    Enable MFA to add an extra layer of security for user accounts in <strong>{project?.name}</strong>.
                 </p>
             </div>
 
